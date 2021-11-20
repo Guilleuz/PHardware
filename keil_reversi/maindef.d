@@ -1,0 +1,13 @@
+.\maindef.o: maindef.c
+.\maindef.o: cola.h
+.\maindef.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+.\maindef.o: eventos.h
+.\maindef.o: gestor_alarmas.h
+.\maindef.o: gestor_energia.h
+.\maindef.o: Gestor_IO.h
+.\maindef.o: gestor_pulsacion.h
+.\maindef.o: timer0.h
+.\maindef.o: timer1.h
+.\maindef.o: sudoku_2021.h
+.\maindef.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\inttypes.h
+.\maindef.o: celda.h

@@ -1,0 +1,1 @@
+.\reiniciarpll.o: reiniciarPLL.s

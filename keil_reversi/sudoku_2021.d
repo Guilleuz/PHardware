@@ -1,0 +1,12 @@
+.\sudoku_2021.o: sudoku_2021.c
+.\sudoku_2021.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
+.\sudoku_2021.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
+.\sudoku_2021.o: sudoku_2021.h
+.\sudoku_2021.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\inttypes.h
+.\sudoku_2021.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+.\sudoku_2021.o: celda.h
+.\sudoku_2021.o: cola.h
+.\sudoku_2021.o: eventos.h
+.\sudoku_2021.o: Gestor_IO.h
+.\sudoku_2021.o: tableros.h
+.\sudoku_2021.o: timer1.h

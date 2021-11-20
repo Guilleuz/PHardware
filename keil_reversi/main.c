@@ -7,26 +7,9 @@
 #include "timer1.h"
 #include "sudoku_2021.h"
 
+// Estado del procesador
 #define APAGADO 0
 #define ENCENDIDO 1
-#define ESPERA_PULSACION 2
-
-// maquinas de estado dibujos
-
-/*
-Sudoku interactua por API con gpio
-    Cada alarma -> Sudoku mira valores del gpio, si ha cambiado, visualiza la nueva celda
-    Para actualizar la visualizacion -> utilizamos la API del gpio
-    Pulsaciones -> Sudoku leerá los valores del gpio, actualizará el juego y visualiza el resultado
-
-Sudoku interactua por eventos con gpio
-    Cada alarma de actualizar el juego -> GPIO mira si han cambiado los valores
-        -> en tal caso generamos un nuevo evento, con los datos auxiliares de fila, columna
-    Sudoku recibe el evento -> genera otro evento con los datos de la nueva celda (valor + candidatos)
-    GPIO recibe el evento -> cambia la visualizacion
-
-    Pulsacion -> se lo pasamos al GPIO -> gpio lee y genera evento
-*/
 
 int main(void) {
 	int estado = ENCENDIDO;
@@ -58,7 +41,6 @@ int main(void) {
 
 
     // Bucle de juego
-    // De momento bucle infinito
     while (1) {
         if(cola_hay_nuevos()) {
             // Si hay un nuevo evento lo procesamos
@@ -74,7 +56,6 @@ int main(void) {
                     break;
                 case evento_eint1:
                     // Gestionamos la pulsación de eint1
-                    // Programamos la alarma períodica del botón
 					if (estado == ENCENDIDO) {
 						// Tratamos la pulsacion
                         sudoku_pulsacion_1();
@@ -82,12 +63,12 @@ int main(void) {
 						// El procesador estaba apagado, la pulsación no cuenta para el juego
 						estado = ENCENDIDO;
 					}
+
                     // Reiniciamos alarma de inactividad
                     cola_guardar_eventos(evento_set_alarma, alarma);
                     break;
                 case evento_eint2:
                     // Gestionamos la pulsación de eint2
-                    // Programamos la alarma períodica del botón
 					if (estado == ENCENDIDO) {
 						// Tratamos la pulsacion
                         sudoku_pulsacion_2();
@@ -99,10 +80,6 @@ int main(void) {
                     // Reiniciamos alarma de inactividad
                     cola_guardar_eventos(evento_set_alarma, alarma);
                     break;
-                case evento_reiniciar:
-                    sudoku_iniciar();
-                    //estado = ESPERA_PULSACION;
-                    cola_guardar_eventos(evento_power_down, 0);
                 case evento_alarma_eint1:
                     // Comprobamos si eint1 sigue pulsado
                     button_actualizar_estado_1();
@@ -112,28 +89,23 @@ int main(void) {
                     button_actualizar_estado_2();
                     break;
                 case evento_actualizar_juego:
-                    // Comprobamos valores de entrada
-                    // si han cambiado, actualizamos valores de salida
-                    // y reiniciamos la alarma de inactividad
-					
-					/* Si hay cambios en la entrada
-					// Reiniciamos alarma de inactividad
-                    cola_guardar_eventos(evento_set_alarma, alarma);
-					*/
+                    // Actualizamos la visualización del juego
                     if (sudoku_actualizar()) {
-                        // Reiniciamos alarma de inactividad
+                        // Si ha habido cambios reiniciamos alarma de inactividad
                         cola_guardar_eventos(evento_set_alarma, alarma);
                     }
-
                     break;
                 case evento_encender_led:
+                    // Encendemos el led de validez
                     gestor_io_led_validez(1);
                     break;
                 case evento_apagar_led:
+                    // Apagamos el led de validez
                     gestor_io_led_validez(0);
                     break;
                 case evento_encender_idle:
                 {
+                    // Encendemos el led de idle
                     gestor_io_latido(1);
                     uint32_t alarma = evento_apagar_idle << 24;
                     alarma |=  0x00000064; // Apagamos el led en 100 ms
@@ -142,6 +114,7 @@ int main(void) {
                 }
                 case evento_apagar_idle:
                 { 
+                    // Apagamos el led de idle
                     gestor_io_latido(0);
                     break;
                 }

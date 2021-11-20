@@ -17,13 +17,17 @@ enum { BIT_CANDIDATOS = 7 };
 
 typedef uint16_t CELDA;
 
+// Devuelve 1 si la celda es una pista, 0 si no
 __inline static uint8_t celda_es_pista(CELDA celda) {
     return celda & 16;
 }
 
+// Pone a 1 el bit de error de la celda
 __inline static void celda_marcar_error(CELDA *celda) {
     *celda = *celda | 0x0020;
 }
+
+// Pone a 0 el bit de error de la celda
 __inline static void celda_desmarcar_error(CELDA *celda) {
     *celda = *celda & 0xffdf;
 }

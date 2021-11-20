@@ -532,11 +532,6 @@
               <FilePath>.\gpio.h</FilePath>
             </File>
             <File>
-              <FileName>maindef.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\maindef.c</FilePath>
-            </File>
-            <File>
               <FileName>sudoku_2021.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\sudoku_2021.c</FilePath>
@@ -570,6 +565,11 @@
               <FileName>candidatos_propagar_arm.s</FileName>
               <FileType>2</FileType>
               <FilePath>.\candidatos_propagar_arm.s</FilePath>
+            </File>
+            <File>
+              <FileName>main.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\main.c</FilePath>
             </File>
           </Files>
         </Group>

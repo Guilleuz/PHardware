@@ -9,6 +9,7 @@ static int nueva_pulsacion_eint2 = 0;
 static int estado_pulsacion_1 = NO_PULSADO;
 static int estado_pulsacion_2 = NO_PULSADO;
 
+// Interrupción del botón 1
 void eint1_ISR (void) __irq {
 	VICIntEnClr = VICIntEnClr | 0x00008000; // Deshabilitamos las interrupciones de eint1
     nueva_pulsacion_eint1 = 1;
@@ -24,6 +25,7 @@ void eint1_ISR (void) __irq {
     cola_guardar_eventos(evento_set_alarma, alarma);
 }
 
+// Interrupción del botón 2
 void eint2_ISR (void) __irq {
     VICIntEnClr = VICIntEnClr | 0x00010000; // Deshabilitamos las interrupciones de ein2
     nueva_pulsacion_eint2 = 1;
@@ -39,6 +41,7 @@ void eint2_ISR (void) __irq {
     cola_guardar_eventos(evento_set_alarma, alarma);
 }
 
+// Inicialización de los botones
 void button_init(void) {
     EXTINT = 6; // Limpia flags de interrupción de eint1 y 2
     PINSEL0 = 0xA0000000;
@@ -49,7 +52,7 @@ void button_init(void) {
     VICIntEnable = VICIntEnable | 0x00018000; // Habilitamos las interrupciones EXTINT 1 y 2
 }
 
-
+// Actualización del estado del botón 1
 void button_actualizar_estado_1(void) {
 	EXTINT =  EXTINT | 2;        // clear interrupt flag de EINT1     
 	if ((EXTINT & 2) == 2 && estado_pulsacion_1 == PULSADO){      // si el boton esta pulsado, la instruccion de arriba no hara nada y EXTINT valdra 1. Si el boton no esta pulsado valdra 0
@@ -60,15 +63,15 @@ void button_actualizar_estado_1(void) {
 		button_clear_nueva_pulsacion_1();
 		// Cancelamos la alarma
 		uint32_t evento = 0;
-    evento = evento_alarma_eint1 << 24;
-    evento |= 0x00800000;
-    gestor_set_alarma(evento);
+		evento = evento_alarma_eint1 << 24;
+		evento |= 0x00800000;
+		gestor_set_alarma(evento);
 		// si no esta pulsado se habilitan las interrupciones (antes ya se ha limpiado el de EXTINT)
 		VICIntEnable = VICIntEnable | 0x00008000; // Enable EXTINT1 Interrupt (la interrupcion del boton se deshabilita a si misma, al terminar la pulsacion hay ue volver a habilitarla)
 	}
 }
 
-
+// Actualización del estado del botón 2
 void button_actualizar_estado_2(void){
 	EXTINT =  EXTINT | 4;        // clear interrupt flag de EINT2   
 	if ((EXTINT & 4) == 4 && estado_pulsacion_2 == PULSADO){ // si el boton esta pulsado, la instruccion de arriba no hara nada y EXTINT valdra 1. Si el boton no esta pulsado valdra 0
@@ -87,18 +90,24 @@ void button_actualizar_estado_2(void){
 	}
 }
 
+// Devuelve 1 si ha habido una nueva pulsación (boton 1), 
+// 0 en caso contrario
 int button_nueva_pulsacion_1(void) {
     return nueva_pulsacion_eint1;
 }
-    
+
+// Devuelve 1 si ha habido una nueva pulsación (boton 2), 
+// 0 en caso contrario    
 int button_nueva_pulsacion_2(void) {
     return nueva_pulsacion_eint2;
 }
 
+// Limpia la pulsación del botón 1
 void button_clear_nueva_pulsacion_1(void) {
     nueva_pulsacion_eint1 = 0;
 }
 
+// Limpia la pulsación del botón 2
 void button_clear_nueva_pulsacion_2(void) {
     nueva_pulsacion_eint2 = 0;
 }

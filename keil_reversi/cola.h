@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include "eventos.h"
 
-// Guarda un nuevo evento
+// Guarda un nuevo evento en la cola
 void cola_guardar_eventos(uint8_t ID_evento, uint32_t auxData);
 
 // Devuelve 0 si no hay nuevos eventos por leer, 1 en caso contrario

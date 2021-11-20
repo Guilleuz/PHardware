@@ -7,6 +7,18 @@
 #include "tableros.h"
 #include "timer1.h"
 
+// El sudoku guardará un estado que indicará si hay una partida en juego o
+// si se va a producir un reinicio.
+// En caso de que vayamos a reiniciar, el juego permanecerá inactivo hasta que 
+// reciba una pulsación de botón, momento en el que se reiniciará el tablero
+// y se dará comienzo al nuevo juego,
+#define JUGANDO 0
+#define REINICIO 1
+static int estado;
+
+static uint8_t fila, columna, ultimoValor;     // Últimos valores de fila, columna y celda leídos de la entrada
+static CELDA tablero[NUM_FILAS][NUM_COLUMNAS]; // Tablero en juego
+
 /* *****************************************************************************
  * propaga el valor de una determinada celda en C
  * para actualizar las listas de candidatos
@@ -84,65 +96,11 @@ static int candidatos_actualizar_c(CELDA cuadricula[NUM_FILAS][NUM_COLUMNAS])
 	return celdas_vacias;
 }
 
-/* Init del sudoku en codigo C invocando a propagar en arm
- * Recibe la cuadricula como primer parametro
- * y devuelve en celdas_vacias el número de celdas vacias
- */
-static int
-candidatos_actualizar_c_arm(CELDA cuadricula[NUM_FILAS][NUM_COLUMNAS])
-{
-    int celdas_vacias = 0;
-    uint8_t i;
-    uint8_t j;
 
-	//borrar todos los candidatos
-    for(i = 0; i < NUM_FILAS; i++) {
-        for (j = 0; j < NUM_FILAS; j++) {
-            celda_inicializar_candidatos(&cuadricula[i][j]);
-        }
-    }
+/**************************************************************/
+// Funciones para el control del juego						   /
+/**************************************************************/
 
-	//recalcular candidatos de las celdas vacias calculando cuantas hay vacias
-    for(i = 0; i < NUM_FILAS; i++) {
-        for (j = 0; j < NUM_FILAS; j++) {
-            if (celda_leer_valor(cuadricula[i][j]) != 0) {
-                candidatos_propagar_arm(cuadricula, i, j);
-            }
-            else celdas_vacias++;
-        }
-    }
-
-	//retornar el numero de celdas vacias
-	return celdas_vacias;
-}
-
-static int
-cuadricula_candidatos_verificar(CELDA cuadricula[NUM_FILAS][NUM_COLUMNAS],
-	 CELDA solucion[NUM_FILAS][NUM_COLUMNAS])
-{
-    int correcto = 1;
-    uint8_t i;
-    uint8_t j;
-
-    for(i=0; i < NUM_FILAS && 1 == correcto; ++i) {
-       for(j=0; j < NUM_FILAS && 1 == correcto; ++j) {
-			correcto = cuadricula[i][j] == solucion[i][j];
-       }
-    }
-    return correcto;
-}
-
-// El sudoku guardará un estado que indicará si hay una partida en juego o
-// si se va a producir un reinicio.
-// En caso de que vayamos a reiniciar, el juego permanecerá inactivo hasta que 
-// reciba una pulsación de botón, momento en el que se reiniciará el tablero
-// y se dará comienzo al nuevo juego,
-#define JUGANDO 0
-#define REINICIO 1
-static int estado;
-
-static uint8_t fila, columna, ultimoValor;     // Últimos valores de fila, columna y celda leídos de la entrada
-static CELDA tablero[NUM_FILAS][NUM_COLUMNAS]; // Tablero en juego
 
 // Inicializamos la partida
 void sudoku_iniciar(void) {
@@ -176,11 +134,15 @@ int sudoku_actualizar(void) {
         columnaIN = gestor_io_leer_col();
         valorIN = gestor_io_leer_valor();
 
-        // Si la celda está fuera de rango
+        // Si la celda está dentro de rango
         if (filaIN <= 8 && columnaIN <= 8) {
             gestor_io_visualizar_celda(celda_leer_valor(tablero[filaIN][columnaIN]), celda_leer_candidatos(tablero[filaIN][columnaIN]));
-            if (celda_es_pista(tablero[filaIN][columnaIN])) cola_guardar_eventos(evento_encender_led, 0);
-            else cola_guardar_eventos(evento_apagar_led, 0);
+            
+            // Si hemos cambiado de celda, encendemos o apagamos el led dependiendo de si es pista o no
+            if (fila != filaIN || columna != columnaIN) {
+                if (celda_es_pista(tablero[filaIN][columnaIN])) cola_guardar_eventos(evento_encender_led, 0);
+                else cola_guardar_eventos(evento_apagar_led, 0);
+            }
         }
 
         // SOLO CAMBIAR EL LED CUANDO CAMBIEMOS DE CELDA

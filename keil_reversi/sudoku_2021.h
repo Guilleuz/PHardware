@@ -50,12 +50,21 @@ int
 candidatos_propagar_arm(CELDA cuadricula[NUM_FILAS][NUM_COLUMNAS],
                                uint8_t fila, uint8_t columna);
 
+
+// Inicializamos la partida
 void sudoku_iniciar(void);
 
+// Actualizamos la visualización de la celda
+// Devolverá 1 en caso de que haya habido un cambio en los pines de entrada
+// Devolverá 0 en caso contrario
 int sudoku_actualizar(void);
 
+// Tratamiento de la pulsación del botón 1
+// Al ser pulsado, se introducirá un valor en la celda
 void sudoku_pulsacion_1(void);
 
+// Tratamiento de la pulsación del botón 2
+// Al ser pulsado, se borrará el valor de la celda
 void sudoku_pulsacion_2(void);
 #endif /* SUDOKU_H_2021 */
 

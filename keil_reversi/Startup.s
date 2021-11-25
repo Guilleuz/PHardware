@@ -270,16 +270,15 @@ MEMMAP          EQU     0xE01FC040      ; Memory Mapping Control
                 MOV     SP, R0
                 SUB     R0, R0, #IRQ_Stack_Size
 
-;  Enter User Mode and set its Stack Pointer
-                MSR     CPSR_c, #Mode_USR
-                MOV     SP, R0
-                SUB     SL, SP, #USR_Stack_Size
-
 ;  Enter Supervisor Mode and set its Stack Pointer
                 MSR     CPSR_c, #Mode_SVC:OR:I_Bit:OR:F_Bit
                 MOV     SP, R0
                 SUB     R0, R0, #SVC_Stack_Size
-
+				
+;  Enter User Mode and set its Stack Pointer
+                MSR     CPSR_c, #Mode_USR
+                MOV     SP, R0
+                SUB     SL, SP, #USR_Stack_Size
 
 ; Enter the C code
 

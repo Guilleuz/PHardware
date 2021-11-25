@@ -11,3 +11,5 @@
 .\main.o: sudoku_2021.h
 .\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\inttypes.h
 .\main.o: celda.h
+.\main.o: RTC.h
+.\main.o: watchdog.h

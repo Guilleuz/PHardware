@@ -6,6 +6,8 @@
 #include "timer0.h"
 #include "timer1.h"
 #include "sudoku_2021.h"
+#include "RTC.h"
+#include "watchdog.h"
 
 // Estado del procesador
 #define APAGADO 0
@@ -13,6 +15,12 @@
 
 int main(void) {
 	int estado = ENCENDIDO;
+	// Inicializa RTC
+	RTC_init();
+	
+	// Inicializa watchdog
+	WD_init(3);
+	
     // Inicializamos el timer1
     temporizador_iniciar();
     temporizador_empezar();
@@ -127,6 +135,9 @@ int main(void) {
         }
         else {
             // Si no entramos en estado idle
+			int s = RTC_leer_segundos();
+			int m = RTC_leer_minutos();
+			WD_feed();
             gestor_energia_idle();
         }
     }

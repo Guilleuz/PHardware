@@ -173,7 +173,7 @@ void sudoku_pulsacion_1(void) {
             // Reiniciamos el juego
             estado = REINICIO;
         }
-        // Si la celda no está fuera de tango, el valor es válido y no es una pista
+        // Si la celda no está fuera de rango, el valor es válido y no es una pista
         else if (filaIN <= 8 && columnaIN <= 8 && valorIN <= 9 && valorIN >= 1 && !celda_es_pista(tablero[filaIN][columnaIN])) {
             int candidatos = celda_leer_candidatos(tablero[filaIN][columnaIN]);
             uint8_t valorAnterior = celda_leer_valor(tablero[filaIN][columnaIN]);
@@ -222,7 +222,7 @@ void sudoku_pulsacion_2(void) {
         uint8_t filaIN, columnaIN;
         filaIN = gestor_io_leer_fila();
         columnaIN = gestor_io_leer_col();
-        // Si la celda no está fuera de tango, no está vacía y no es una pista
+        // Si la celda no está fuera de rango, no está vacía y no es una pista
         if (filaIN <= 8 && columnaIN <= 8 && celda_leer_valor(tablero[filaIN][columnaIN]) != 0 && !celda_es_pista(tablero[filaIN][columnaIN])) {
             celda_desmarcar_error(&tablero[filaIN][columnaIN]);
             celda_poner_valor(&tablero[filaIN][columnaIN], 0);

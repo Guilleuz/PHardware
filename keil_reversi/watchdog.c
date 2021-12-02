@@ -1,11 +1,12 @@
 #include "watchdog.h"
+#include "gestor_interrupciones.h"
 #include <LPC210X.H>  
 
 void WD_feed(void) {
-    // Desactivar interrupciones
+    disable_isr_fiq();
     WDFEED = 0xAA;
     WDFEED = 0x55;
-    // Activar interrupciones
+    enable_isr_fiq();
 }
 
 void WD_init(int sec) {

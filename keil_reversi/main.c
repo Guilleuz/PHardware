@@ -8,15 +8,22 @@
 #include "sudoku_2021.h"
 #include "RTC.h"
 #include "watchdog.h"
+#include "gestor_interrupciones.h"
 
 // Estado del procesador
 #define APAGADO 0
 #define ENCENDIDO 1
 
+
+
 int main(void) {
 	int estado = ENCENDIDO;
 	// Inicializa RTC
 	RTC_init();
+	disable_isr();
+	enable_isr();
+	disable_isr_fiq();
+	enable_isr_fiq();
 	
 	// Inicializa watchdog
 	WD_init(3);
@@ -26,7 +33,7 @@ int main(void) {
     temporizador_empezar();
 
     // Inicializamos el timer0 (50ms)
-    temporizador_periodico(50);
+    temporizador_periodico(5);
 
     // Inicializamos el gestor io
     gestor_io_init();

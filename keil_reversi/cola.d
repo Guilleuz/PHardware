@@ -4,3 +4,4 @@
 .\cola.o: eventos.h
 .\cola.o: timer1.h
 .\cola.o: Gestor_IO.h
+.\cola.o: gestor_interrupciones.h

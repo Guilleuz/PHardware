@@ -21,5 +21,6 @@ void temporizador_periodico(int periodo) {
 	// 4 is the number of the interrupt assigned. Number 4 is the Timer 0 (see table 40 of the LPC2105 user manual  
 	VICVectCntl0 = 0x20 | 4;                   
     VICIntEnable = VICIntEnable | 0x00000010;                  // Enable Timer0 Interrupt
+    VICIntSelect |= 1;
 }
     

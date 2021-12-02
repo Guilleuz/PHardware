@@ -1,4 +1,5 @@
 #include "timer1.h"
+#include <stdint.h>
 #include <LPC210X.H>                            // LPC21XX Peripheral Registers
 
 // Cuenta en microsegundos
@@ -15,9 +16,8 @@ void temporizador_empezar(void) {
     T1TCR = 1;         // Timer1 Enable	
 }
 
-// Leemos el valor del timer
-int temporizador_leer(void) {
-		return T1TC;
+uint32_t __SWI_0 (void) {
+    return T1TC;
 }
 
 // Reinicia el contador del timer y lo para

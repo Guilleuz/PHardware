@@ -20,8 +20,8 @@ __inline static int periodo(int i) {
 }
 
 // devuelve el identificador del evento
-__inline static evento_identificador evento_ID(int n) {
-    return (n & 0xff000000) >> 24;
+__inline static enum evento_identificador evento_ID(int n) {
+    return (enum evento_identificador) ((n & 0xff000000) >> 24);
 }
 
 // Programamos una alarma
@@ -31,7 +31,7 @@ void gestor_set_alarma(uint32_t evento) {
         if (ocupado[i] && evento_ID(eventos[i]) == evento_ID(evento)) {
             // En tal caso, reprogramamos la alarma
             eventos[i] = evento;
-			tInicio[i] = temporizador_leer();
+			tInicio[i] = clock_gettime();
             if (periodo(i) == 0) {
                 // Cancelamos la alarma si su retardo es 0
                 ocupado[i] = 0;
@@ -45,7 +45,7 @@ void gestor_set_alarma(uint32_t evento) {
         if (!ocupado[i]) {
             ocupado[i] = 1;
             eventos[i] = evento;
-            tInicio[i] = temporizador_leer();
+            tInicio[i] = clock_gettime();
             if (periodo(i) == 0) {
                 // Cancelamos la alarma si su retardo es 0
                 ocupado[i] = 0;
@@ -61,13 +61,13 @@ void gestor_set_alarma(uint32_t evento) {
 void gestor_disparar_alarmas(void) {
     for (int i = 0; i < NUM_ALARMAS; i++) {
         // Comprobamos si ha vencido el tiempo de cada alarma
-        if (ocupado[i] && periodo(i) <= (temporizador_leer() - tInicio[i]) / 1000) {
+        if (ocupado[i] && periodo(i) <= (clock_gettime() - tInicio[i]) / 1000) {
             // En tal caso, lanzamos el evento correspondiente
             cola_guardar_eventos(evento_ID(eventos[i]), 0);
 
             // Si la alarma es períodica se reinicia, en otro caso se cancela
             if (!esPeriodico(i)) ocupado[i] = 0;
-            else tInicio[i] = temporizador_leer();
+            else tInicio[i] = clock_gettime();
         }
     }
 }

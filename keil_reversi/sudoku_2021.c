@@ -181,15 +181,15 @@ void sudoku_pulsacion_1(void) {
             
             if (valorAnterior == 0) {
                 // Si la celda está vacía, no será necesario actualizar los candidatos
-                int tiempo = temporizador_leer();
+                int tiempo = clock_gettime();
                 candidatos_propagar_c(tablero, filaIN, columnaIN);
-                tiempo = temporizador_leer() - tiempo;
+                tiempo = clock_gettime() - tiempo;
             } 
             else {
                 // Si la celdía ya tenía valor, recalculamos los candidatos
-                int tiempo = temporizador_leer();
+                int tiempo = clock_gettime();
                 candidatos_actualizar_c(tablero);
-                tiempo = temporizador_leer() - tiempo;
+                tiempo = clock_gettime() - tiempo;
             }
             
             if ((candidatos & (1 << (valorIN - 1))) == 0) {
@@ -226,10 +226,10 @@ void sudoku_pulsacion_2(void) {
         if (filaIN <= 8 && columnaIN <= 8 && celda_leer_valor(tablero[filaIN][columnaIN]) != 0 && !celda_es_pista(tablero[filaIN][columnaIN])) {
             celda_desmarcar_error(&tablero[filaIN][columnaIN]);
             celda_poner_valor(&tablero[filaIN][columnaIN], 0);
-            int tiempo = temporizador_leer();
+            int tiempo = clock_gettime();
             // Actualizamos los candidatos
             candidatos_actualizar_c(tablero);
-            tiempo = temporizador_leer() - tiempo;
+            tiempo = clock_gettime() - tiempo;
             
             // Encendemos el led y lo apagamos después de 1s
             cola_guardar_eventos(evento_encender_led, 0);

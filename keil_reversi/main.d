@@ -13,3 +13,4 @@
 .\main.o: celda.h
 .\main.o: RTC.h
 .\main.o: watchdog.h
+.\main.o: gestor_interrupciones.h

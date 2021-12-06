@@ -3,6 +3,9 @@
 
 #include <stdint.h>
 
+
+void gestor_io_nuevo_char(uint32_t caracter);
+
 /* Inicializamos el GPIO estableciendo como entrada y salida
    los pines que nos interesan */
 void gestor_io_init(void);

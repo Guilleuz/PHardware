@@ -14,7 +14,8 @@ enum evento_identificador {
     evento_encender_led,
     evento_apagar_led, 
     evento_encender_idle, 
-    evento_apagar_idle
+    evento_apagar_idle,
+    evento_nuevo_caracter
 };
 
 // Identificadores de los distintos eventos utilizados

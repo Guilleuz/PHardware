@@ -18,5 +18,7 @@
 ".\watchdog.o"
 ".\rtc.o"
 ".\swi.o"
+".\botones.o"
+".\gestor_lineaserie.o"
 --strict --scatter ".\keil_reversi.sct"
 --summary_stderr --info summarysizes -o .\keil_reversi.axf

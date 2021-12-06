@@ -1,7 +1,34 @@
 #include "Gestor_IO.h"
 #include "gpio.h"
 #include <stdint.h>
+#include <string.h>
 
+static char buffer[10];
+static int ultimo = 0;
+static int ultimoInit = -1;
+
+void gestor_io_nuevo_char(uint32_t caracter) {
+a	char c = caracter & 0xff;
+	if (ultimo == ultimoInit) ultimoInit = -1;
+	buffer[ultimo] = c;
+	if (c == '#') ultimoInit = ultimo;
+	else if (c == '!' && ultimoInit != -1) {
+		char comando[11];
+		if (ultimoInit < ultimo) {
+			strncpy(comando, buffer + ultimoInit + 1, ultimo - ultimoInit - 1);
+		} else if (ultimoInit == 9) {
+			strncpy(comando, buffer, ultimo);
+		} else{
+			char sub[11];
+			strncpy(comando, buffer + ultimoInit + 1, 10 - ultimoInit - 1);
+			strncpy(sub, buffer, ultimo);
+			strcat(comando, sub);
+		}
+
+		ultimoInit = -1;
+	}
+	ultimo = (ultimo + 1) % 10;
+}
 
 /* Inicializamos el GPIO estableciendo como entrada y salida
    los pines que nos interesan */

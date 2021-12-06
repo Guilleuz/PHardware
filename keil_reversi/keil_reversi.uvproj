@@ -601,6 +601,26 @@
               <FileType>5</FileType>
               <FilePath>.\gestor_interrupciones.h</FilePath>
             </File>
+            <File>
+              <FileName>botones.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\botones.c</FilePath>
+            </File>
+            <File>
+              <FileName>botones.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\botones.h</FilePath>
+            </File>
+            <File>
+              <FileName>gestor_lineaserie.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\gestor_lineaserie.h</FilePath>
+            </File>
+            <File>
+              <FileName>gestor_lineaserie.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\gestor_lineaserie.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

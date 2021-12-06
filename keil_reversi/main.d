@@ -5,6 +5,7 @@
 .\main.o: gestor_alarmas.h
 .\main.o: gestor_energia.h
 .\main.o: Gestor_IO.h
+.\main.o: botones.h
 .\main.o: gestor_pulsacion.h
 .\main.o: timer0.h
 .\main.o: timer1.h
@@ -14,3 +15,4 @@
 .\main.o: RTC.h
 .\main.o: watchdog.h
 .\main.o: gestor_interrupciones.h
+.\main.o: gestor_lineaserie.h

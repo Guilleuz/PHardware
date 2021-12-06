@@ -2,6 +2,7 @@
 #include "gestor_alarmas.h"
 #include "gestor_energia.h"
 #include "Gestor_IO.h"
+#include "botones.h"
 #include "gestor_pulsacion.h"
 #include "timer0.h"
 #include "timer1.h"
@@ -9,6 +10,7 @@
 #include "RTC.h"
 #include "watchdog.h"
 #include "gestor_interrupciones.h"
+#include "gestor_lineaserie.h"
 
 // Estado del procesador
 #define APAGADO 0
@@ -18,6 +20,8 @@
 
 int main(void) {
 	int estado = ENCENDIDO;
+	// Init linea serie
+	gestor_init();
 	// Inicializa RTC
 	RTC_init();
 	disable_isr();
@@ -78,7 +82,7 @@ int main(void) {
 						// El procesador estaba apagado, la pulsación no cuenta para el juego
 						estado = ENCENDIDO;
 					}
-
+                    pulsacion_nueva_pulsacion_1();
                     // Reiniciamos alarma de inactividad
                     cola_guardar_eventos(evento_set_alarma, alarma);
                     break;
@@ -91,17 +95,19 @@ int main(void) {
 						// El procesador estaba apagado, la pulsación no cuenta para el juego
 						estado = ENCENDIDO;
 					}
-					
+					pulsacion_nueva_pulsacion_2();
                     // Reiniciamos alarma de inactividad
                     cola_guardar_eventos(evento_set_alarma, alarma);
                     break;
+                case evento_nuevo_caracter:
+                    gestor_io_nuevo_char(e.datosAux);
                 case evento_alarma_eint1:
                     // Comprobamos si eint1 sigue pulsado
-                    button_actualizar_estado_1();
+                    pulsacion_actualizar_estado_1();
                     break;
                 case evento_alarma_eint2:
                     // Comprobamos si eint2 sigue pulsado
-                    button_actualizar_estado_2();
+                    pulsacion_actualizar_estado_2();
                     break;
                 case evento_actualizar_juego:
                     // Actualizamos la visualización del juego
@@ -136,7 +142,7 @@ int main(void) {
                 case evento_power_down:
                     // Pasamos al modo power down
                     estado = APAGADO;
-                    gestor_energia_power_down();
+                    //gestor_energia_power_down();
                     break;
             }
         }

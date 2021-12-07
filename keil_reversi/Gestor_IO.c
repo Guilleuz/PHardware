@@ -7,7 +7,7 @@
 #include <string.h>
 #include <ctype.h>
 
-static char bufferEnvio[1000];
+static char bufferEnvio[500];
 static int siguiente;
 static int total;
 

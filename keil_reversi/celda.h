@@ -22,6 +22,11 @@ __inline static uint8_t celda_es_pista(CELDA celda) {
     return celda & 16;
 }
 
+// Devuelve 1 si la celda es un error, 0 si no
+__inline static uint8_t celda_es_error(CELDA celda) {
+    return celda & 32;
+}
+
 // Pone a 1 el bit de error de la celda
 __inline static void celda_marcar_error(CELDA *celda) {
     *celda = *celda | 0x0020;

@@ -58,11 +58,6 @@ int main(void) {
     alarmaIdle |=  0x008000fa; 
     cola_guardar_eventos(evento_set_alarma, alarmaIdle);
 
-    //char * cadena = "0123456789          0123456789012345678901234567890123456789012345678901234567890\n-|\t3\t|\n-|\t3P\t|\n-|\t\t|\n-|\t 1 2 3\t|\n-\n-\n-\n-\n-\n-\n-\n-\n-\n-\n-\n-\n-\n-\n-\n-\n-\n-\n-\n-\n-\n-\n-\n-\n-\n-\n-\n-\n-\n-\n-\n-\n-\n-\n-\n-\n-\n-\n-\n-\n-";
-    char * cadena = "|       | 1 2 3 |       ||       | 1 2 3 |       ||   3P  | 4   6 |   5E  |\n|   3   |     6 | 4     ||       | 1 2 3 |       ||   3P  | 4   6 |   5E  |\n|   3   |     6 | 4     ||   3P  | 4   6 |   5E  ||   3   |     6 | 4     |";
-
-    //\n*-------------------------------------------------------------------------*"
-		gestor_io_enviar_cadena(cadena);
 
     // Bucle de juego
     while (1) {

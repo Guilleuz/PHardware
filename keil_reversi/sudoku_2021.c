@@ -6,6 +6,9 @@
 #include "eventos.h"
 #include "tableros.h"
 #include "timer1.h"
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
 
 // El sudoku guardará un estado que indicará si hay una partida en juego o
 // si se va a producir un reinicio.
@@ -101,6 +104,41 @@ static int candidatos_actualizar_c(CELDA cuadricula[NUM_FILAS][NUM_COLUMNAS])
 // Funciones para el control del juego						   /
 /**************************************************************/
 
+void sudoku_to_string(CELDA sudoku[NUM_FILAS][NUM_COLUMNAS], char *cadena) {
+    char *separador = "+ - - + - - + - - ++ - - + - - + - - ++ - - + - - + - - +\n";
+    strcpy(cadena, "");  
+    for (int i = 0; i < 9; i++) {
+        strcat(cadena, separador);
+        if (i % 3 == 0) strcat(cadena, separador);
+        char linea[1000] = "";
+        for(int j = 0; j < 9; j++) {
+            char celda[100];
+            char cValor;
+            char cTipo;
+            int valor = celda_leer_valor(sudoku[i][j]);
+            
+            if (valor != 0) cValor = valor + '0';
+            else cValor = ' ';
+
+            if (celda_es_pista(sudoku[i][j])) cTipo = 'P';
+            else if (celda_es_error(sudoku[i][j])) cTipo = 'E';
+            else cTipo = ' ';
+            sprintf(celda, "|  %c%c ", cValor, cTipo); 
+
+            if (j % 3 == 2 && j != 8) {
+                strcat(celda, "|\n");
+            }
+            strcat(linea, celda);
+            free(celda);
+        }
+
+        strcat(cadena, linea);
+        strcat(cadena, "|");
+        free(linea);
+    }
+
+    strcat(cadena, separador);
+}
 
 // Inicializamos la partida
 void sudoku_iniciar(void) {
@@ -117,6 +155,9 @@ void sudoku_iniciar(void) {
     
     // Inicializamos los candidatos del tablero
 	candidatos_actualizar_c(tablero);
+    char cadena[500];
+    sudoku_to_string(tablero, cadena);
+    gestor_io_enviar_cadena(cadena);
     // Establecemos una alarma períodica, para actualizar el juego cada 200ms
     uint32_t alarma = evento_actualizar_juego << 24;
     alarma |= 0x008000c8; 

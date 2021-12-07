@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 
+void gestor_io_enviar_cadena(char* cadena);
+void gestor_io_continuar_mensaje(void);
 
 void gestor_io_nuevo_char(uint32_t caracter);
 

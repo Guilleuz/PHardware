@@ -1,14 +1,52 @@
 #include "Gestor_IO.h"
 #include "gpio.h"
+#include "eventos.h"
+#include "cola.h"
+#include <LPC210x.H>   
 #include <stdint.h>
 #include <string.h>
+#include <ctype.h>
+
+static char bufferEnvio[1000];
+static int siguiente;
+static int total;
 
 static char buffer[10];
 static int ultimo = 0;
 static int ultimoInit = -1;
 
+void gestor_io_enviar_cadena(char* cadena) {
+	strcpy(bufferEnvio, cadena);
+	siguiente = 0;
+	total = strlen(bufferEnvio);
+
+	if (total > 0) {
+		U0THR = bufferEnvio[siguiente];
+		siguiente++;
+	} else {
+		cola_guardar_eventos(evento_cadena_enviada, 0);
+	}
+}
+
+void gestor_io_continuar_mensaje(void) {
+	if(siguiente < total) {
+	U0THR = bufferEnvio[siguiente];
+	siguiente++;
+	if (siguiente == total) 
+		cola_guardar_eventos(evento_cadena_enviada, 0);
+	}
+}
+
+int esNumero(char* cadena) {
+	for (int i = 0; i < strlen(cadena); i++) {
+		if (!isdigit(cadena[i])) return 0;
+	}
+	
+	return 1;
+}
+
 void gestor_io_nuevo_char(uint32_t caracter) {
-a	char c = caracter & 0xff;
+	char c = caracter & 0xff;
 	if (ultimo == ultimoInit) ultimoInit = -1;
 	buffer[ultimo] = c;
 	if (c == '#') ultimoInit = ultimo;
@@ -22,7 +60,24 @@ a	char c = caracter & 0xff;
 			char sub[11];
 			strncpy(comando, buffer + ultimoInit + 1, 10 - ultimoInit - 1);
 			strncpy(sub, buffer, ultimo);
-			strcat(comando, sub);
+			if (ultimo != 0) {
+				strcat(comando, sub);
+			}
+		}
+
+		if (strcmp(comando, "RST") == 0) {
+			cola_guardar_eventos(evento_reset_juego, 0);
+		} else if (strcmp(comando, "NEW") == 0) {
+			cola_guardar_eventos(evento_empezar_juego, 0);
+		} else if (strlen(comando) == 4 && esNumero(comando)) {
+			if (comando[3] - '0' == (comando[0] - '0' + comando[1] - '0' + comando[2] - '0') % 8) {
+				// Si el checksum es correcto
+				uint32_t auxData = (comando[0] - '0') << 16;
+				auxData |= (comando[1] - '0') << 8;
+				auxData |= comando[2] - '0';
+				// Bits 0-7 valor, 8-15 col, 16-23 fila
+				cola_guardar_eventos(evento_jugada, auxData);
+			}
 		}
 
 		ultimoInit = -1;
@@ -83,3 +138,16 @@ int gestor_io_leer_valor(void) {
 }
 
 
+
+
+/*|		| 1 2 3	|		|
+|	3P	| 4   6	|	5E	|
+|		|   8 9 |		|
+-------------------------
+|		| 1 2 3	|		|
+|	3P	| 4   6	|	5E	|
+|		|   8 9 |		|
+-------------------------
+|		| 1 2 3	|		|
+|	3P	| 4   6	|	5E	|
+|		|   8 9 |		|*/

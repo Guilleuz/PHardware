@@ -154,18 +154,18 @@
         <Bp>
           <Number>0</Number>
           <Type>0</Type>
-          <LineNumber>11</LineNumber>
+          <LineNumber>29</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>2160</Address>
+          <Address>1088</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>C:\Users\guill\OneDrive\Universidad\3Âº\PH\P3\keil_reversi\Gestor_IO.c</Filename>
+          <Filename>C:\Users\guill\OneDrive\Universidad\3Âº\PH\P3\keil_reversi\cola.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\keil_reversi\Gestor_IO.c\11</Expression>
+          <Expression>\\keil_reversi\cola.c\29</Expression>
         </Bp>
       </Breakpoint>
       <WatchWindow1>
@@ -187,17 +187,17 @@
         <Ww>
           <count>3</count>
           <WinNumber>1</WinNumber>
-          <ItemText>comando</ItemText>
+          <ItemText>bufferEnvio</ItemText>
         </Ww>
         <Ww>
           <count>4</count>
           <WinNumber>1</WinNumber>
-          <ItemText>sub1</ItemText>
+          <ItemText>siguiente</ItemText>
         </Ww>
         <Ww>
           <count>5</count>
           <WinNumber>1</WinNumber>
-          <ItemText>sub2</ItemText>
+          <ItemText>total</ItemText>
         </Ww>
       </WatchWindow1>
       <MemoryWindow1>

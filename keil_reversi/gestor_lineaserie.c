@@ -12,6 +12,7 @@ void uart0_ISR(void) __irq {
         cola_guardar_eventos(evento_nuevo_caracter, auxData);
     } else if (interruptID == 1) {
         // Se ha escrito el char
+        cola_guardar_eventos(evento_continuar_envio, 0);
         int b = 1;
     }
     char a = U0RBR;

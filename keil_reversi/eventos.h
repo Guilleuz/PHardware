@@ -15,7 +15,12 @@ enum evento_identificador {
     evento_apagar_led, 
     evento_encender_idle, 
     evento_apagar_idle,
-    evento_nuevo_caracter
+    evento_nuevo_caracter,
+    evento_reset_juego,
+    evento_empezar_juego,
+    evento_jugada,
+    evento_cadena_enviada,
+    evento_continuar_envio
 };
 
 // Identificadores de los distintos eventos utilizados

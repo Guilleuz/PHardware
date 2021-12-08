@@ -105,14 +105,15 @@ static int candidatos_actualizar_c(CELDA cuadricula[NUM_FILAS][NUM_COLUMNAS])
 /**************************************************************/
 
 void sudoku_to_string(CELDA sudoku[NUM_FILAS][NUM_COLUMNAS], char *cadena) {
-    char *separador = "+ - - + - - + - - ++ - - + - - + - - ++ - - + - - + - - +\n";
+    static char separador[100] = "+ - - + - - + - - ++ - - + - - + - - ++ - - + - - + - - +\n";
     strcpy(cadena, "");  
+		static char linea[1000];
+		static char celda[100];
     for (int i = 0; i < 9; i++) {
         strcat(cadena, separador);
         if (i % 3 == 0) strcat(cadena, separador);
-        char linea[1000] = "";
         for(int j = 0; j < 9; j++) {
-            char celda[100];
+            strcpy(celda, "");
             char cValor;
             char cTipo;
             int valor = celda_leer_valor(sudoku[i][j]);
@@ -126,19 +127,40 @@ void sudoku_to_string(CELDA sudoku[NUM_FILAS][NUM_COLUMNAS], char *cadena) {
             sprintf(celda, "|  %c%c ", cValor, cTipo); 
 
             if (j % 3 == 2 && j != 8) {
-                strcat(celda, "|\n");
+                strcat(celda, "|");
             }
             strcat(linea, celda);
-            free(celda);
         }
 
         strcat(cadena, linea);
-        strcat(cadena, "|");
-        free(linea);
+        strcat(cadena, "|\n");
+		strcpy(linea, "");
     }
 
     strcat(cadena, separador);
+
+    for (int i = 0; i < 9; i++) {
+        strcat(cadena, "\n");
+        for (int j = 0; j < 9; j++) {
+            if (celda_leer_valor(sudoku[i][j]) == 0) {
+                int candidatos = celda_leer_candidatos(sudoku[i][j]);
+                sprintf(linea, "%d-%d ", i, j);
+                for (int h = 0; h < 9; h++) {
+                    if ((candidatos & (1 << h)) == 0) {
+                        sprintf(celda, "%d", h+1);
+                        strcat(linea, celda);
+                    }
+                }
+                strcat(linea, "\t");
+                strcat(cadena, linea);
+                strcat(linea, "   -");
+                strcat(linea, " a");
+            }
+        }
+    }
 }
+
+static char cadenaSudoku[5000];
 
 // Inicializamos la partida
 void sudoku_iniciar(void) {
@@ -155,9 +177,8 @@ void sudoku_iniciar(void) {
     
     // Inicializamos los candidatos del tablero
 	candidatos_actualizar_c(tablero);
-    char cadena[500];
-    sudoku_to_string(tablero, cadena);
-    gestor_io_enviar_cadena(cadena);
+    sudoku_to_string(tablero, cadenaSudoku);
+    gestor_io_enviar_cadena(cadenaSudoku);
     // Establecemos una alarma períodica, para actualizar el juego cada 200ms
     uint32_t alarma = evento_actualizar_juego << 24;
     alarma |= 0x008000c8; 

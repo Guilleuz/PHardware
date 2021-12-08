@@ -7,7 +7,7 @@
 #include <string.h>
 #include <ctype.h>
 
-static char bufferEnvio[500];
+static char bufferEnvio[5000];
 static int siguiente;
 static int total;
 
@@ -16,8 +16,9 @@ static int ultimo = 0;
 static int ultimoInit = -1;
 
 void gestor_io_enviar_cadena(char* cadena) {
-	strcpy(bufferEnvio, cadena);
-	siguiente = 0;
+	siguiente = -1;
+	strcpy(bufferEnvio, cadena); // corrompe la pila
+	siguiente++;
 	total = strlen(bufferEnvio);
 
 	if (total > 0) {

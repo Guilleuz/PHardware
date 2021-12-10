@@ -7,36 +7,8 @@
 #include <string.h>
 #include <ctype.h>
 
-static char bufferEnvio[5000];
-static int siguiente;
-static int total;
-
 static char buffer[10];
 static int ultimo = 0;
-static int ultimoInit = -1;
-
-void gestor_io_enviar_cadena(char* cadena) {
-	siguiente = -1;
-	strcpy(bufferEnvio, cadena); // corrompe la pila
-	siguiente++;
-	total = strlen(bufferEnvio);
-
-	if (total > 0) {
-		U0THR = bufferEnvio[siguiente];
-		siguiente++;
-	} else {
-		cola_guardar_eventos(evento_cadena_enviada, 0);
-	}
-}
-
-void gestor_io_continuar_mensaje(void) {
-	if(siguiente < total) {
-	U0THR = bufferEnvio[siguiente];
-	siguiente++;
-	if (siguiente == total) 
-		cola_guardar_eventos(evento_cadena_enviada, 0);
-	}
-}
 
 int esNumero(char* cadena) {
 	for (int i = 0; i < strlen(cadena); i++) {
@@ -46,44 +18,44 @@ int esNumero(char* cadena) {
 	return 1;
 }
 
-void gestor_io_nuevo_char(uint32_t caracter) {
-	char c = caracter & 0xff;
-	if (ultimo == ultimoInit) ultimoInit = -1;
-	buffer[ultimo] = c;
-	if (c == '#') ultimoInit = ultimo;
-	else if (c == '!' && ultimoInit != -1) {
-		char comando[11];
-		if (ultimoInit < ultimo) {
-			strncpy(comando, buffer + ultimoInit + 1, ultimo - ultimoInit - 1);
-		} else if (ultimoInit == 9) {
-			strncpy(comando, buffer, ultimo);
-		} else{
-			char sub[11];
-			strncpy(comando, buffer + ultimoInit + 1, 10 - ultimoInit - 1);
-			strncpy(sub, buffer, ultimo);
-			if (ultimo != 0) {
-				strcat(comando, sub);
-			}
-		}
-
-		if (strcmp(comando, "RST") == 0) {
-			cola_guardar_eventos(evento_reset_juego, 0);
-		} else if (strcmp(comando, "NEW") == 0) {
-			cola_guardar_eventos(evento_empezar_juego, 0);
-		} else if (strlen(comando) == 4 && esNumero(comando)) {
-			if (comando[3] - '0' == (comando[0] - '0' + comando[1] - '0' + comando[2] - '0') % 8) {
-				// Si el checksum es correcto
-				uint32_t auxData = (comando[0] - '0') << 16;
-				auxData |= (comando[1] - '0') << 8;
-				auxData |= comando[2] - '0';
-				// Bits 0-7 valor, 8-15 col, 16-23 fila
-				cola_guardar_eventos(evento_jugada, auxData);
-			}
-		}
-
-		ultimoInit = -1;
-	}
-	ultimo = (ultimo + 1) % 10;
+void gestor_io_nuevo_char(char caracter) {
+    
+    if (ultimo == 0 && caracter == '#') { // Si introducimos '#' como primer valor, lo guardamos en el buffer
+        buffer[ultimo] = caracter;
+        ultimo = (ultimo + 1) % 10;
+    } else if (ultimo != 0 && caracter == '#') { // Si introducimos '#', la movemos a la primera posición del buffer si no lo está
+        ultimo = 0; 
+        buffer[ultimo] = caracter;
+        ultimo = (ultimo + 1) % 10;
+    } else if (buffer[0] == '#' && caracter == '!') { // Si hay '#' en la primera posición y recibimos '!', guardamos comando
+            char comando[10]; 
+						strncpy(comando, buffer + 1, ultimo - 1);
+						comando[ultimo - 1] = '\0';
+            if (strcmp(comando, "RST") == 0) {
+                cola_guardar_eventos(evento_reset_juego, 0);
+            }
+            else if (strcmp(comando, "NEW") == 0) {
+                cola_guardar_eventos(evento_empezar_juego, 0);
+            }
+            else if (strlen(comando) == 4 && esNumero(comando)) {
+                int fila = comando[0] - '0';
+                int columna = comando[1] - '0';
+                int valor = comando[2] - '0';
+                int check = comando[3] - '0'; 
+                if (check == (fila + columna + valor) % 8) {
+                    // Si el checksum es correcto
+                    uint32_t auxData = (fila) << 16;
+                    auxData |= (columna) << 8;
+                    auxData |= valor - '0';
+                    // Bits 0-7 valor, 8-15 col, 16-23 fila
+                    cola_guardar_eventos(evento_jugada, auxData);
+                } // CHECKSUM SUDOKU
+            }
+            ultimo = 0;
+    } else { // Si recibimos cualquier otro caracter, guardamos en buffer
+        buffer[ultimo] = caracter;
+        ultimo = (ultimo + 1) % 10;
+    }
 }
 
 /* Inicializamos el GPIO estableciendo como entrada y salida

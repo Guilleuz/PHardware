@@ -3,10 +3,7 @@
 
 #include <stdint.h>
 
-void gestor_io_enviar_cadena(char* cadena);
-void gestor_io_continuar_mensaje(void);
-
-void gestor_io_nuevo_char(uint32_t caracter);
+void gestor_io_nuevo_char(char caracter);
 
 /* Inicializamos el GPIO estableciendo como entrada y salida
    los pines que nos interesan */

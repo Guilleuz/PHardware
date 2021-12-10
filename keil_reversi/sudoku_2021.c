@@ -6,6 +6,7 @@
 #include "eventos.h"
 #include "tableros.h"
 #include "timer1.h"
+#include "gestor_lineaserie.h"
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -151,7 +152,7 @@ void sudoku_to_string(CELDA sudoku[NUM_FILAS][NUM_COLUMNAS], char *cadena) {
                         strcat(linea, celda);
                     }
                 }
-                strcat(linea, "\t");
+                strcat(linea, "\t\t\t");
                 strcat(cadena, linea);
                 strcat(linea, "   -");
                 strcat(linea, " a");
@@ -178,7 +179,7 @@ void sudoku_iniciar(void) {
     // Inicializamos los candidatos del tablero
 	candidatos_actualizar_c(tablero);
     sudoku_to_string(tablero, cadenaSudoku);
-    gestor_io_enviar_cadena(cadenaSudoku);
+    gestor_ls_enviar_cadena(cadenaSudoku);
     // Establecemos una alarma períodica, para actualizar el juego cada 200ms
     uint32_t alarma = evento_actualizar_juego << 24;
     alarma |= 0x008000c8; 

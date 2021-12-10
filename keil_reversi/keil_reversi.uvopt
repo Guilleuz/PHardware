@@ -150,7 +150,24 @@
           <Name>(107=-1,-1,-1,-1,0)(108=-1,-1,-1,-1,0)(106=-1,-1,-1,-1,0)(105=-1,-1,-1,-1,0)(80=-1,-1,-1,-1,0)(104=-1,-1,-1,-1,0)(100=-1,-1,-1,-1,0)(101=-1,-1,-1,-1,0)(102=-1,-1,-1,-1,0)(103=-1,-1,-1,-1,0)(113=-1,-1,-1,-1,0)(112=-1,-1,-1,-1,0)(117=-1,-1,-1,-1,0)(118=-1,-1,-1,-1,0)(110=-1,-1,-1,-1,0)(111=-1,-1,-1,-1,0)(114=-1,-1,-1,-1,0)(115=-1,-1,-1,-1,0)(116=-1,-1,-1,-1,0)</Name>
         </SetRegEntry>
       </TargetDriverDllRegistry>
-      <Breakpoint/>
+      <Breakpoint>
+        <Bp>
+          <Number>0</Number>
+          <Type>0</Type>
+          <LineNumber>109</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>5980</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>C:\Users\guill\OneDrive\Universidad\3Âº\PH\P3\keil_reversi\main.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression></Expression>
+        </Bp>
+      </Breakpoint>
       <WatchWindow1>
         <Ww>
           <count>0</count>
@@ -160,7 +177,7 @@
         <Ww>
           <count>1</count>
           <WinNumber>1</WinNumber>
-          <ItemText>ultimo</ItemText>
+          <ItemText>comando</ItemText>
         </Ww>
         <Ww>
           <count>2</count>
@@ -186,6 +203,16 @@
           <count>6</count>
           <WinNumber>1</WinNumber>
           <ItemText>cola</ItemText>
+        </Ww>
+        <Ww>
+          <count>7</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>\\keil_reversi\Gestor_IO.c\ultimo</ItemText>
+        </Ww>
+        <Ww>
+          <count>8</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>comando</ItemText>
         </Ww>
       </WatchWindow1>
       <MemoryWindow1>

@@ -42,14 +42,14 @@ void gestor_io_nuevo_char(char caracter) {
                 int columna = comando[1] - '0';
                 int valor = comando[2] - '0';
                 int check = comando[3] - '0'; 
-                if (check == (fila + columna + valor) % 8) {
-                    // Si el checksum es correcto
-                    uint32_t auxData = (fila) << 16;
-                    auxData |= (columna) << 8;
-                    auxData |= valor - '0';
-                    // Bits 0-7 valor, 8-15 col, 16-23 fila
-                    cola_guardar_eventos(evento_jugada, auxData);
-                } // CHECKSUM SUDOKU
+                
+                // Bits 0-7 valor, 8-15 col, 16-23 fila, 24-31 checksum
+                uint32_t auxData = (check) << 24;
+                auxData |= (fila) << 16;
+                auxData |= (columna) << 8;
+                auxData |= valor - '0';
+                
+                cola_guardar_eventos(evento_jugada, auxData);
             }
             ultimo = 0;
     } else { // Si recibimos cualquier otro caracter, guardamos en buffer

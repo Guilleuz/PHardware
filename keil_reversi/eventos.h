@@ -20,7 +20,8 @@ enum evento_identificador {
     evento_empezar_juego,
     evento_jugada,
     evento_cadena_enviada,
-    evento_continuar_envio
+    evento_continuar_envio,
+    evento_timeout
 };
 
 // Identificadores de los distintos eventos utilizados

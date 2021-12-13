@@ -16,9 +16,15 @@
 // En caso de que vayamos a reiniciar, el juego permanecerá inactivo hasta que 
 // reciba una pulsación de botón, momento en el que se reiniciará el tablero
 // y se dará comienzo al nuevo juego,
-#define JUGANDO 0
-#define REINICIO 1
-static int estado;
+
+enum estado_sudoku {
+    INICIO,
+    JUGANDO,
+    JUGADA_INTRODUCIDA,
+    FINAL
+};
+
+static enum estado_sudoku estado;
 
 static uint8_t fila, columna, ultimoValor;     // Últimos valores de fila, columna y celda leídos de la entrada
 static CELDA tablero[NUM_FILAS][NUM_COLUMNAS]; // Tablero en juego
@@ -139,7 +145,11 @@ void sudoku_to_string(CELDA sudoku[NUM_FILAS][NUM_COLUMNAS], char *cadena) {
     }
 
     strcat(cadena, separador);
+}
 
+void candidatos_to_string(CELDA sudoku[NUM_FILAS][NUM_COLUMNAS], char *cadena) {
+    static char linea[1000];
+	  static char candidatosString[50];
     for (int i = 0; i < 9; i++) {
         strcat(cadena, "\n");
         for (int j = 0; j < 9; j++) {
@@ -148,24 +158,21 @@ void sudoku_to_string(CELDA sudoku[NUM_FILAS][NUM_COLUMNAS], char *cadena) {
                 sprintf(linea, "%d-%d ", i, j);
                 for (int h = 0; h < 9; h++) {
                     if ((candidatos & (1 << h)) == 0) {
-                        sprintf(celda, "%d", h+1);
-                        strcat(linea, celda);
+                        sprintf(candidatosString, "%d", h+1);
+                        strcat(linea, candidatosString);
                     }
                 }
                 strcat(linea, "\t\t\t");
                 strcat(cadena, linea);
-                strcat(linea, "   -");
-                strcat(linea, " a");
             }
         }
     }
 }
-
 static char cadenaSudoku[5000];
-
+static char cadenaInicio[500] = "\t\t\tSUDOKU\nIntroduzca '#NEW!' para comenzar partida o pulse uno de los botones\nIntroduzca '#RST!' para finalizar\nUna vez en la partida, introduzca '#FCVS!' para realizar una jugada:\n   siendo 'F' la Fila, 'C' la columna, 'V' el valor de la celda\n   y 'S' el resultado de aplicar modulo 8 a la suma F + C + V.\nSi la jugada es correcta, tendra 3s para confirmarla o cancelarla.";
 // Inicializamos la partida
 void sudoku_iniciar(void) {
-    estado = JUGANDO;
+    estado = INICIO;
     fila = 0;
     columna = 0;
     ultimoValor = 0;
@@ -178,8 +185,7 @@ void sudoku_iniciar(void) {
     
     // Inicializamos los candidatos del tablero
 	candidatos_actualizar_c(tablero);
-    sudoku_to_string(tablero, cadenaSudoku);
-    gestor_ls_enviar_cadena(cadenaSudoku);
+    //gestor_ls_enviar_cadena(cadenaInicio);
     // Establecemos una alarma períodica, para actualizar el juego cada 200ms
     uint32_t alarma = evento_actualizar_juego << 24;
     alarma |= 0x008000c8; 
@@ -225,85 +231,120 @@ int sudoku_actualizar(void) {
 // Tratamiento de la pulsación del botón 1
 // Al ser pulsado, se introducirá un valor en la celda
 void sudoku_pulsacion_1(void) {
-    if (estado == JUGANDO) {    
-        int filaIN, columnaIN, valorIN;
-        filaIN = gestor_io_leer_fila();
-        columnaIN = gestor_io_leer_col();
-        valorIN = gestor_io_leer_valor();
-        
-        // Si se introduce un 0 en la columna 0, fila 0, reiniciamos el juego
-        if (filaIN == 0 && columnaIN == 0 && valorIN == 0) {
-            // Reiniciamos el juego
-            estado = REINICIO;
-        }
-        // Si la celda no está fuera de rango, el valor es válido y no es una pista
-        else if (filaIN <= 8 && columnaIN <= 8 && valorIN <= 9 && valorIN >= 1 && !celda_es_pista(tablero[filaIN][columnaIN])) {
-            int candidatos = celda_leer_candidatos(tablero[filaIN][columnaIN]);
-            uint8_t valorAnterior = celda_leer_valor(tablero[filaIN][columnaIN]);
-            celda_poner_valor(&tablero[filaIN][columnaIN], valorIN);
-            
-            if (valorAnterior == 0) {
-                // Si la celda está vacía, no será necesario actualizar los candidatos
-                int tiempo = clock_gettime();
-                candidatos_propagar_c(tablero, filaIN, columnaIN);
-                tiempo = clock_gettime() - tiempo;
-            } 
-            else {
-                // Si la celdía ya tenía valor, recalculamos los candidatos
-                int tiempo = clock_gettime();
-                candidatos_actualizar_c(tablero);
-                tiempo = clock_gettime() - tiempo;
-            }
-            
-            if ((candidatos & (1 << (valorIN - 1))) == 0) {
-                // Si el valor introducido era un posible candidato de la celda
-                // La jugada será válica
-                celda_desmarcar_error(&tablero[filaIN][columnaIN]);
-                
-                // Encendemos el led y lo apagamos después de 1s
-                cola_guardar_eventos(evento_encender_led, 0);
-                uint32_t alarma = evento_apagar_led << 24;
-                alarma |= 0x000003e8; 
-                cola_guardar_eventos(evento_set_alarma, alarma);
-            }
-            else {
-                // En caso contrario, la jugada es errónea
-                celda_marcar_error(&tablero[filaIN][columnaIN]);
-            }
-        }
-    }
-    else {
-        // Si recibimos una pulsación y no hay una partida en juego, lo reiniciamos
-        sudoku_iniciar();
+    switch (estado) {
+        case INICIO:
+            estado = JUGANDO;
+            break;
+        case JUGADA_INTRODUCIDA:
+            // Confirmamos jugada
+            estado = JUGANDO;
+
+            // Cancelamos el timeout
+            uint32_t alarmaTimeout = evento_timeout << 24;
+            alarmaTimeout |=  0x00000000; 
+            cola_guardar_eventos(evento_set_alarma, alarmaTimeout);
+
+            // Desactivamos la alarma del led
+            uint32_t alarmaLED = evento_encender_idle << 24;
+            alarmaLED |=  0x00800000; 
+            cola_guardar_eventos(evento_set_alarma, alarmaLED);
+            break;
+        case FINAL: 
+            estado = JUGANDO;
+            break;
     }
 }
 
 // Tratamiento de la pulsación del botón 2
 // Al ser pulsado, se borrará el valor de la celda
 void sudoku_pulsacion_2(void) {
-    if (estado == JUGANDO) {
-        uint8_t filaIN, columnaIN;
-        filaIN = gestor_io_leer_fila();
-        columnaIN = gestor_io_leer_col();
-        // Si la celda no está fuera de rango, no está vacía y no es una pista
-        if (filaIN <= 8 && columnaIN <= 8 && celda_leer_valor(tablero[filaIN][columnaIN]) != 0 && !celda_es_pista(tablero[filaIN][columnaIN])) {
-            celda_desmarcar_error(&tablero[filaIN][columnaIN]);
-            celda_poner_valor(&tablero[filaIN][columnaIN], 0);
-            int tiempo = clock_gettime();
-            // Actualizamos los candidatos
-            candidatos_actualizar_c(tablero);
-            tiempo = clock_gettime() - tiempo;
-            
-            // Encendemos el led y lo apagamos después de 1s
-            cola_guardar_eventos(evento_encender_led, 0);
-            uint32_t alarma = evento_apagar_led << 24;
-            alarma |= 0x000003e8;
-            cola_guardar_eventos(evento_set_alarma, alarma);
-        }
-    }
-    else {
-        // Si recibimos una pulsación y no hay una partida en juego, lo reiniciamos
-        sudoku_iniciar();
+		char cancelado[100] = "\n--- JUGADA CANCELADA ---\n";
+    switch (estado) {
+        case INICIO:
+            estado = JUGANDO;
+            break;
+        case JUGADA_INTRODUCIDA:
+            // Cancelamos jugada
+
+            // Cancelamos el timeout
+            uint32_t alarmaTimeout = evento_timeout << 24;
+            alarmaTimeout |=  0x00000000; 
+            cola_guardar_eventos(evento_set_alarma, alarmaTimeout);
+
+            // Desactivamos la alarma del led
+            uint32_t alarmaLED = evento_encender_idle << 24;
+            alarmaLED |=  0x00800000; 
+            cola_guardar_eventos(evento_set_alarma, alarmaLED);
+
+            //gestor_ls_enviar_cadena(cancelado);
+            estado = JUGANDO;  
+            break;   
+        case FINAL: 
+            estado = JUGANDO;
+            break;
     }
 }
 
+void sudoku_introducir_jugada(uint8_t fila, uint8_t columna, uint8_t valor) {
+    // Previsualizacion
+    sudoku_to_string(tablero, cadenaSudoku);
+    char preVis[200];
+    sprintf(preVis, "\nNUEVA JUGADA: Posicion de la celda:\n  Fila:%d\n  Columna:%d\nValor de la celda: %d\n", fila, columna, valor);
+    strcat(cadenaSudoku, preVis);
+    //gestor_ls_enviar_cadena(cadenaSudoku);
+    
+    // Timeout de 3 segundos
+    uint32_t alarmaTimeout = evento_timeout << 24;
+    alarmaTimeout |=  0x00000bb8; 
+    cola_guardar_eventos(evento_set_alarma, alarmaTimeout);
+
+    // Activar led (parpadear)
+    // Programamos una alarma que cada 250ms encienda el led del latido de idle
+    uint32_t alarmaLED = evento_encender_idle << 24;
+    alarmaLED |=  0x008000fa; 
+    cola_guardar_eventos(evento_set_alarma, alarmaLED);
+
+    estado = JUGADA_INTRODUCIDA;
+}
+
+void sudoku_jugada(uint32_t auxData) {
+    uint8_t fila, columna, valor, check;
+    if (estado == JUGANDO) {
+        check = auxData >> 24;
+        fila = auxData >> 16;
+        columna = auxData >> 8;
+        valor = auxData;
+        // True si la celda y su valor estan dentro del rango admisible, y si la celda no es una pista
+        int enRango = fila <= 8 && columna<= 8 && valor <= 9 && !celda_es_pista(tablero[fila][columna]);
+        // Checksum correcto
+        if (check == (fila + columna + valor) % 8 && enRango) {
+            sudoku_introducir_jugada(fila, columna, valor);
+        }
+    }
+}
+
+void sudoku_nuevo(void) {
+    if (estado == INICIO || estado == FINAL) {
+        estado = JUGANDO;
+    }
+}
+
+void sudoku_reset(void) {
+    if (estado == JUGANDO || estado == JUGADA_INTRODUCIDA) {
+        estado = FINAL;
+    }
+}
+
+void sudoku_timeout() {
+    if (estado == JUGADA_INTRODUCIDA) {
+        // Se cancela la jugada
+        estado = JUGANDO;
+        char cancelado[100] = "\n--- JUGADA CANCELADA ---\n";
+        //gestor_ls_enviar_cadena(cancelado);
+
+        // Desactivamos la alarma del led
+        uint32_t alarmaLED = evento_encender_idle << 24;
+        alarmaLED |=  0x00800000; 
+        cola_guardar_eventos(evento_set_alarma, alarmaLED);
+    } 
+}

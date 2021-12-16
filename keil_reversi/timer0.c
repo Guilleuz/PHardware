@@ -22,5 +22,7 @@ void temporizador_periodico(int periodo) {
 	VICVectCntl0 = 0x20 | 4;                   
     VICIntEnable = VICIntEnable | 0x00000010;                  // Enable Timer0 Interrupt
     VICIntSelect |= 1;
+	// Para la fiq -> poner en pila de expepciones la dir del vic
+	// Mirar conf timer0 para ponerlo modo fiq
 }
     

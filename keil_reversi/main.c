@@ -30,7 +30,7 @@ int main(void) {
 	enable_isr_fiq();
 	
 	// Inicializa watchdog
-	WD_init(3);
+	WD_init(20);
 	
     // Inicializamos el timer1
     temporizador_iniciar();
@@ -62,6 +62,7 @@ int main(void) {
         if(cola_hay_nuevos()) {
             // Si hay un nuevo evento lo procesamos
             struct Evento e = cola_ultimo_evento();
+			WD_feed(); // cada vez que lea un evento alimenta al WD
             switch (e.ID) {
                 case evento_timer0:
                     // Disparamos las alarmas períodicas
@@ -99,6 +100,8 @@ int main(void) {
                     break;
                 case evento_nuevo_caracter:
                     gestor_io_nuevo_char(e.datosAux);
+					// Reiniciamos alarma de inactividad
+                    cola_guardar_eventos(evento_set_alarma, alarma);
 					break;
                 case evento_empezar_juego:
                     sudoku_nuevo();
@@ -146,7 +149,7 @@ int main(void) {
                 case evento_power_down:
                     // Pasamos al modo power down
                     estado = APAGADO;
-                    //gestor_energia_power_down();
+                    gestor_energia_power_down();
                     break;
             }
         }
@@ -154,7 +157,6 @@ int main(void) {
             // Si no entramos en estado idle
 			int s = RTC_leer_segundos();
 			int m = RTC_leer_minutos();
-			WD_feed();
             gestor_energia_idle();
         }
     }

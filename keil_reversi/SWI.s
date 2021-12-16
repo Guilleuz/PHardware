@@ -37,6 +37,10 @@ SWI_Handler
 				BEQ		enable_isr_fiq
                 CMP		R12, #0xFC
 				BEQ		disable_isr_fiq
+                CMP     R12, #0xFB
+                BEQ     enable_fiq
+                CMP     R12, #0xFA
+                BEQ     disable_fiq
 
                 LDR     R8, SWI_Count
                 CMP     R12, R8
@@ -90,6 +94,16 @@ disable_isr_fiq
                 orr r12, r12, #0x000000c0
                 msr SPSR_cxsf, r12
                 LDMFD   SP!, {R12, PC}^ 
+enable_fiq
+                LDMFD   SP!, {R8, R12}
+                eor r12, r12, #0x00000040
+                msr SPSR_cxsf, r12
+                LDMFD   SP!, {R12, PC}^ 
+disable_fiq
+                LDMFD   SP!, {R8, R12}
+                orr r12, r12, #0x00000040
+                msr SPSR_cxsf, r12
+                LDMFD   SP!, {R12, PC}^
 
                 END
 

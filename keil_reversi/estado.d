@@ -1,0 +1,1 @@
+.\estado.o: estado.s

@@ -38,16 +38,16 @@ void gestor_io_nuevo_char(char caracter) {
                 cola_guardar_eventos(evento_empezar_juego, 0);
             }
             else if (strlen(comando) == 4 && esNumero(comando)) {
-                int fila = comando[0] - '0';
-                int columna = comando[1] - '0';
-                int valor = comando[2] - '0';
-                int check = comando[3] - '0'; 
+                uint8_t fila = comando[0] - '0';
+                uint8_t columna = comando[1] - '0';
+                uint8_t valor = comando[2] - '0';
+                uint8_t check = comando[3] - '0'; 
                 
                 // Bits 0-7 valor, 8-15 col, 16-23 fila, 24-31 checksum
                 uint32_t auxData = (check) << 24;
                 auxData |= (fila) << 16;
                 auxData |= (columna) << 8;
-                auxData |= valor - '0';
+                auxData |= valor;
                 
                 cola_guardar_eventos(evento_jugada, auxData);
             }

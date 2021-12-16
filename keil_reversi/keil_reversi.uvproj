@@ -621,6 +621,11 @@
               <FileType>1</FileType>
               <FilePath>.\gestor_lineaserie.c</FilePath>
             </File>
+            <File>
+              <FileName>estado.s</FileName>
+              <FileType>2</FileType>
+              <FilePath>.\estado.s</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

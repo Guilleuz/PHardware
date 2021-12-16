@@ -8,10 +8,47 @@ static struct Evento cola[32];
 static volatile uint8_t sinLeer[32] = {0}; // 0, el evento ha sido leído, 1 no
 static volatile int ultimo = 0;            // indice que indica el último elemento añadido
 static volatile int ultimoLeido = 0;       // indice que indica el último elemento leído
+extern int get_CPSR(void);
+
+enum estado_interrupciones {
+    IRQ_FIQ_HABILITADAS,
+    FIQ_HABILITADA,
+    DESCONOCIDO
+};
+
+
+enum estado_interrupciones cola_preprotocol() {
+    int estado = get_CPSR();
+    int fiqEnabled = ((estado & 0x40) >> 6) != 1;
+    int isrEnabled = ((estado & 0x80) >> 7) != 1;
+        
+    // irqs -> i deshabilitada, f habilitada
+    // fiqs -> i deshabilitada, f habilitada
+    // llamada no interrupcion -> i, f habilitadas
+
+    if (isrEnabled && fiqEnabled) {
+        // IRQs y FIQs habilitadas, llamada habitual
+        disable_isr_fiq();
+        return IRQ_FIQ_HABILITADAS;
+    } else if (fiqEnabled) {
+        // IRQs deshabilitadas y FIQs habilitadas, llamada desde interrupción
+        disable_fiq();
+        return FIQ_HABILITADA;
+    }
+
+    return DESCONOCIDO;
+}
+
+void cola_postprotocol(enum estado_interrupciones estado) {
+    if (estado == IRQ_FIQ_HABILITADAS) enable_isr_fiq();
+    else if (estado == FIQ_HABILITADA) enable_fiq();
+}
+
 
 // Guarda un nuevo evento en la cola
 void cola_guardar_eventos(uint8_t ID, uint32_t auxData) {
-    disable_isr_fiq();
+	enum estado_interrupciones estado = cola_preprotocol();
+	
     if (!sinLeer[ultimo]) {
         struct Evento e;
         e.ID = (enum evento_identificador)ID;
@@ -28,7 +65,8 @@ void cola_guardar_eventos(uint8_t ID, uint32_t auxData) {
         gestor_io_overflow();
         while (1);
     }
-    enable_isr_fiq();
+    
+    cola_postprotocol(estado);
 }
 
 // Devuelve 0 si no hay nuevos eventos por leer, 1 en caso contrario

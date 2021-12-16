@@ -9,8 +9,14 @@ static char bufferEnvio[5000];
 static int siguiente;
 static int total;
 
+// EN gestor IO
+// para poder mandar varias cadenas sin esperar
+// buffer de x espacio con dos indices i, j
+// Nueva cadena, escribo a partir de j
+// Voy escribiendo lo de i
+
 void gestor_ls_enviar_cadena(char* cadena) {
-	strcpy(bufferEnvio, cadena); // corrompe la pila
+	strcpy(bufferEnvio, cadena);
 	siguiente = 0;
 	total = strlen(bufferEnvio);
 

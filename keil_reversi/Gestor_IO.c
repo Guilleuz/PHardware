@@ -12,14 +12,13 @@ static int ultimo = 0;
 
 int esNumero(char* cadena) {
 	for (int i = 0; i < strlen(cadena); i++) {
-		if (!isdigit(cadena[i])) return 0;
+		if (cadena[i] - '0' < 0 || cadena[i] - '0' > 9) return 0;
 	}
 	
 	return 1;
 }
 
 void gestor_io_nuevo_char(char caracter) {
-    
     if (ultimo == 0 && caracter == '#') { // Si introducimos '#' como primer valor, lo guardamos en el buffer
         buffer[ultimo] = caracter;
         ultimo = (ultimo + 1) % 10;

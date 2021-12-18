@@ -11,5 +11,6 @@
 .\sudoku_2021.o: tableros.h
 .\sudoku_2021.o: timer1.h
 .\sudoku_2021.o: gestor_lineaserie.h
+.\sudoku_2021.o: RTC.h
 .\sudoku_2021.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
 .\sudoku_2021.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h

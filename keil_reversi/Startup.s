@@ -163,6 +163,7 @@ Vectors         LDR     PC, Reset_Addr
 				
 ; Dario
                 IMPORT SWI_Handler
+				IMPORT timer0_ISR
 
 Reset_Addr      DCD     Reset_Handler
 Undef_Addr      DCD     Undef_Handler
@@ -171,7 +172,8 @@ PAbt_Addr       DCD     PAbt_Handler
 DAbt_Addr       DCD     DAbt_Handler
                 DCD     0                      ; Reserved Address 
 IRQ_Addr        DCD     IRQ_Handler
-FIQ_Addr        DCD     FIQ_Handler
+;FIQ_Addr        DCD     FIQ_Handler
+FIQ_Addr        DCD     timer0_ISR
 
 Undef_Handler   B       Undef_Handler
 ; SWI_Handler     B       SWI_Handler

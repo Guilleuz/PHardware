@@ -22,12 +22,6 @@ int main(void) {
 	int estado = ENCENDIDO;
 	// Init linea serie
 	gestor_ls_init();
-	// Inicializa RTC
-	RTC_init();
-	disable_isr();
-	enable_isr();
-	disable_isr_fiq();
-	enable_isr_fiq();
 	
 	// Inicializa watchdog
 	WD_init(20);

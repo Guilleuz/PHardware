@@ -16,6 +16,11 @@ void temporizador_empezar(void) {
     T1TCR = 1;         // Timer1 Enable	
 }
 
+uint32_t temporizador_leer(void) {
+    return T1TC;
+}
+
+
 uint32_t __SWI_0 (void) {
     return T1TC;
 }

@@ -13,7 +13,7 @@ extern int get_CPSR(void);
 enum estado_interrupciones {
     IRQ_FIQ_HABILITADAS,
     FIQ_HABILITADA,
-    DESCONOCIDO
+    IRQ_FIQ_DESHABILITADAS
 };
 
 
@@ -36,7 +36,7 @@ enum estado_interrupciones cola_preprotocol() {
         return FIQ_HABILITADA;
     }
 
-    return DESCONOCIDO;
+    return IRQ_FIQ_DESHABILITADAS;
 }
 
 void cola_postprotocol(enum estado_interrupciones estado) {
@@ -44,6 +44,16 @@ void cola_postprotocol(enum estado_interrupciones estado) {
     else if (estado == FIQ_HABILITADA) enable_fiq();
 }
 
+uint32_t obtener_tiempo() {
+    int estado = get_CPSR();
+    int modoFiq = (estado & 0x0000001f) == 0x11;
+    if (modoFiq) {
+        return temporizador_leer();
+    }
+    else {
+        return clock_gettime();
+    }
+}
 
 // Guarda un nuevo evento en la cola
 void cola_guardar_eventos(uint8_t ID, uint32_t auxData) {
@@ -54,7 +64,7 @@ void cola_guardar_eventos(uint8_t ID, uint32_t auxData) {
         e.ID = (enum evento_identificador)ID;
         e.datosAux = auxData;
         // Asignar valor del timer
-        e.timestamp = clock_gettime();
+        e.timestamp = obtener_tiempo();
         cola[ultimo] = e;
         sinLeer[ultimo] = 1;
         ultimo = (ultimo + 1) % 32;

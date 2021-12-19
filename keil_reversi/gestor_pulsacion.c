@@ -7,6 +7,7 @@
 static int estado_pulsacion_1 = NO_PULSADO;
 static int estado_pulsacion_2 = NO_PULSADO;
 
+// Registramos una pulsación del botón 1
 void pulsacion_nueva_pulsacion_1(void) {
 	estado_pulsacion_1 = PULSADO;
 
@@ -16,6 +17,7 @@ void pulsacion_nueva_pulsacion_1(void) {
     cola_guardar_eventos(evento_set_alarma, alarma);
 }
 
+// Registramos una nueva pulsación del botón 2
 void pulsacion_nueva_pulsacion_2(void) {
 	estado_pulsacion_2 = PULSADO;
 

@@ -12,6 +12,7 @@ void temporizador_empezar(void);
 uint32_t __swi(0) clock_gettime(void);
 uint32_t __SWI_0 (void);
 
+// Devuelve el tiempo transcurrido en microsegundos
 uint32_t temporizador_leer(void);
 
 // Reinicia el contador del timer y lo para

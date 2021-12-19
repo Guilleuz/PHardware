@@ -14,14 +14,9 @@ void timer0_ISR (void) __irq {
 void temporizador_periodico(int periodo) {
 	T0MR0 = (60000 * periodo) - 1; 
     T0MCR = 3;                     // Generates an interrupt and resets the count when the value of MR0 is reached
-    T0TCR = 1;                     // Timer0 Enable
-    // Configuramos el VIC
-	//VICVectAddr0 = (unsigned long)timer0_ISR;          // set interrupt vector in 0
-    // 0x20 bit 5 enables vectored IRQs. 
-	// 4 is the number of the interrupt assigned. Number 4 is the Timer 0 (see table 40 of the LPC2105 user manual  
-	//VICVectCntl0 = 0x20 | 4;                   
-    VICIntEnable = VICIntEnable | 0x00000010;                  // Enable Timer0 Interrupt
-    VICIntSelect |= 0x00000010; // seleccionar fiq o irq
-	// Para la fiq -> poner en pila de expepciones la dir del vic
+    T0TCR = 1;                     // Timer0 Enable            
+    // Activamos las interrupciones del timer0, configuradas como FIQ     
+    VICIntEnable = VICIntEnable | 0x00000010;                  
+    VICIntSelect |= 0x00000010; 
 }
     

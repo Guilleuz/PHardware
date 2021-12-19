@@ -2,6 +2,7 @@
 #include "gestor_interrupciones.h"
 #include <LPC210X.H>  
 
+// Alimenta al Watchdog
 void WD_feed(void) {
     disable_isr_fiq();
     WDFEED = 0xAA;
@@ -9,6 +10,7 @@ void WD_feed(void) {
     enable_isr_fiq();
 }
 
+// Inicia el Watchdog
 void WD_init(int sec) {
     if( WDMOD & 0x04 ) {
         WDMOD &= ~0x04;	

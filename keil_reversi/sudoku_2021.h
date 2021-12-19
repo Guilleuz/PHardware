@@ -55,18 +55,21 @@ candidatos_propagar_arm(CELDA cuadricula[NUM_FILAS][NUM_COLUMNAS],
 void sudoku_iniciar(void);
 
 // Tratamiento de la pulsación del botón 1
-// Al ser pulsado, se introducirá un valor en la celda
 void sudoku_pulsacion_1(void);
 
 // Tratamiento de la pulsación del botón 2
-// Al ser pulsado, se borrará el valor de la celda
 void sudoku_pulsacion_2(void);
-#endif /* SUDOKU_H_2021 */
 
+// Comportamiento al iniciar nueva partida
 void sudoku_nuevo(void);
 
+// Comportamiento al reiniciar sudoku
 void sudoku_reset(void);
 
+// Procesamos un evento de jugada recibido
 void sudoku_jugada(uint32_t auxData);
 
+// Tratamiento timeout de confirmación
 void sudoku_timeout(void);
+
+#endif /* SUDOKU_H_2021 */

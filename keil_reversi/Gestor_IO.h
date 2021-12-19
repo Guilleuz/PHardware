@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 
+// Almacenamos un nuevo caracter en el buffer de entrada
 void gestor_io_nuevo_char(char caracter);
 
 /* Inicializamos el GPIO estableciendo como entrada y salida

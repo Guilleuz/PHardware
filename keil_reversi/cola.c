@@ -44,10 +44,13 @@ void cola_postprotocol(enum estado_interrupciones estado) {
     else if (estado == FIQ_HABILITADA) enable_fiq();
 }
 
+// Devuelve el tiempo en microsegundos
 uint32_t obtener_tiempo() {
     int estado = get_CPSR();
     int modoFiq = (estado & 0x0000001f) == 0x11;
+
     if (modoFiq) {
+        // Si estamos en modo FIQ, no utilizamos SWI
         return temporizador_leer();
     }
     else {
@@ -57,6 +60,7 @@ uint32_t obtener_tiempo() {
 
 // Guarda un nuevo evento en la cola
 void cola_guardar_eventos(uint8_t ID, uint32_t auxData) {
+    // Desactivamos las interrupciones si fuera necesario
 	enum estado_interrupciones estado = cola_preprotocol();
 	
     if (!sinLeer[ultimo]) {
@@ -76,6 +80,7 @@ void cola_guardar_eventos(uint8_t ID, uint32_t auxData) {
         while (1);
     }
     
+    // Activamos las interrupciones necesarias para recuperar el estado inicial
     cola_postprotocol(estado);
 }
 

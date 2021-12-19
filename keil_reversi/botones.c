@@ -5,7 +5,7 @@
 // Interrupción del botón 1
 void eint1_ISR (void) __irq {
 	VICIntEnClr = VICIntEnClr | 0x00008000; // Deshabilitamos las interrupciones de eint1
-    EXTINT =  EXTINT | 2;                   // Limpiamos la interrupción    _
+    EXTINT =  EXTINT | 2;                   // Limpiamos la interrupción
 	VICVectAddr = 0;
     cola_guardar_eventos(evento_eint1, 0);  // Guardamos un evento en la cola indicando la pulsación
 	

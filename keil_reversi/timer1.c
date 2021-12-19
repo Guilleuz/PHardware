@@ -16,11 +16,12 @@ void temporizador_empezar(void) {
     T1TCR = 1;         // Timer1 Enable	
 }
 
+// Devuelve el tiempo transcurrido en microsegundos
 uint32_t temporizador_leer(void) {
     return T1TC;
 }
 
-
+// Devuelve el tiempo transcurrido en microsegundos
 uint32_t __SWI_0 (void) {
     return T1TC;
 }

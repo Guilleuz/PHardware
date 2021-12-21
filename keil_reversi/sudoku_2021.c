@@ -221,13 +221,14 @@ void sudoku_to_string(CELDA sudoku[NUM_FILAS][NUM_COLUMNAS], char *cadena) {
 // así como el tiempo empleado un cálculos en microsegundos
 // Indica también el motivo del final de la partida
 void sudoku_imprime_final(char *motivoFinal) {
-    static char mensajeFinal[300] = "\n--- FIN DE LA PARTIDA ---\nMotivo: ";
+    static char mensajeFinal[300];
     static char tiempos[300];
     
+	strcpy(mensajeFinal, "\n--- FIN DE LA PARTIDA ---\nMotivo: ");
     strcat(mensajeFinal, motivoFinal);
     sprintf(tiempos, "\nTiempo de juego total: %d minutos y %d segundos\nTiempo de calculo de candidatos: %d microsegundos\nSi quiere volver a jugar, escriba '#NEW!' o pulse cualquier boton\n", RTC_leer_minutos(), RTC_leer_segundos(), tiempoTotal);
     strcat(mensajeFinal, tiempos);
-    gestor_ls_enviar_cadena(mensajeFinal);
+    gestor_io_enviar_cadena(mensajeFinal);
 }
 
 /**************************************************************/
@@ -250,7 +251,7 @@ void sudoku_iniciar(void) {
     
     // Inicializamos los candidatos del tablero
 	candidatos_actualizar_c(tablero);
-    gestor_ls_enviar_cadena(cadenaInicio);
+    gestor_io_enviar_cadena(cadenaInicio);
     
     // Establecemos una alarma períodica, para actualizar el juego cada 200ms
     uint32_t alarma = evento_actualizar_juego << 24;
@@ -290,7 +291,7 @@ void sudoku_introducir_jugada(uint8_t fila, uint8_t columna, uint8_t valor) {
 
     // Mostramos el tablero resultante
     sudoku_to_string(tablero, cadenaSudoku);
-    gestor_ls_enviar_cadena(cadenaSudoku);
+    gestor_io_enviar_cadena(cadenaSudoku);
 }
 
 // Procesamos un evento de jugada recibido
@@ -311,7 +312,7 @@ void sudoku_jugada(uint32_t auxData) {
             // Mostramos la nueva jugada
             char preVis[200];
             sprintf(preVis, "\n\nNUEVA JUGADA: Posicion de la celda:\n  Fila:%d\n  Columna:%d\n  Valor de la celda: %d\n", fila, columna, valor);
-            gestor_ls_enviar_cadena(preVis);
+            gestor_io_enviar_cadena(preVis);
             
             // Guardamos los valores de fila y columna de la jugada
             filaJugada = fila;
@@ -351,14 +352,14 @@ void sudoku_pulsacion_1(void) {
 
             // Mostramos el tablero inicial
             sudoku_to_string(tablero, cadenaSudoku);
-            gestor_ls_enviar_cadena(cadenaSudoku);
+            gestor_io_enviar_cadena(cadenaSudoku);
             break;
 		}
         case JUGADA_INTRODUCIDA:
         {
             // Confirmamos la jugada
             char mensajeConfirmacion[200] = "\n\n--- JUGADA CONFIRMADA ---";
-            gestor_ls_enviar_cadena(mensajeConfirmacion);
+            gestor_io_enviar_cadena(mensajeConfirmacion);
 
             // Pasamos a estado JUGANDO
             estado = JUGANDO;
@@ -385,7 +386,7 @@ void sudoku_pulsacion_1(void) {
 		{
 		    // Mostramos el tablero inicial
             sudoku_to_string(tablero, cadenaSudoku);
-            gestor_ls_enviar_cadena(cadenaSudoku);
+            gestor_io_enviar_cadena(cadenaSudoku);
 
             // Pasamos a estado JUGANDO
             estado = JUGANDO;
@@ -405,12 +406,12 @@ void sudoku_pulsacion_2(void) {
 
             // Mostramos el tablero inicial
             sudoku_to_string(tablero, cadenaSudoku);
-            gestor_ls_enviar_cadena(cadenaSudoku);
+            gestor_io_enviar_cadena(cadenaSudoku);
             break;
 		}
         case JUGADA_INTRODUCIDA:
         {
-			gestor_ls_enviar_cadena(cancelado);
+			gestor_io_enviar_cadena(cancelado);
             // Cancelamos la jugada
             sudoku_introducir_jugada(filaJugada, columnaJugada, valorOriginal);
 
@@ -432,7 +433,7 @@ void sudoku_pulsacion_2(void) {
 		{
 			// Mostramos el tablero inicial 
             sudoku_to_string(tablero, cadenaSudoku);
-            gestor_ls_enviar_cadena(cadenaSudoku);
+            gestor_io_enviar_cadena(cadenaSudoku);
 
             // Pasamos a estado JUGANDO
             estado = JUGANDO;
@@ -446,7 +447,7 @@ void sudoku_nuevo(void) {
     if (estado == INICIO || estado == FINAL) {
         // mostrar el tablero inicial
         sudoku_to_string(tablero, cadenaSudoku);
-        gestor_ls_enviar_cadena(cadenaSudoku);
+        gestor_io_enviar_cadena(cadenaSudoku);
 
         // Pasamos a estado JUGANDO
         estado = JUGANDO;
@@ -469,7 +470,7 @@ void sudoku_timeout() {
         // Se cancela la jugada
         estado = JUGANDO;
         char cancelado[100] = "\n\n--- JUGADA CANCELADA ---\n";
-        gestor_ls_enviar_cadena(cancelado);
+        gestor_io_enviar_cadena(cancelado);
 
         // Cancelamos jugada
         sudoku_introducir_jugada(filaJugada, columnaJugada, valorOriginal);

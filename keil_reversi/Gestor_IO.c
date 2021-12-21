@@ -2,6 +2,7 @@
 #include "gpio.h"
 #include "eventos.h"
 #include "cola.h"
+#include "gestor_lineaserie.h"
 #include <LPC210x.H>   
 #include <stdint.h>
 #include <string.h>
@@ -9,6 +10,11 @@
 
 static char buffer[10];
 static int ultimo = 0;
+
+// 
+void gestor_io_enviar_cadena(char *cadena) {
+    gestor_ls_enviar_cadena(cadena);
+}
 
 // Devuelve 1 si todos los caracteres de cadena son numéricos, 0 en caso contrario
 int esNumero(char* cadena) {

@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 
+void gestor_io_enviar_cadena(char *cadena);
+
 // Almacenamos un nuevo caracter en el buffer de entrada
 void gestor_io_nuevo_char(char caracter);
 

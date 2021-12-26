@@ -226,9 +226,11 @@ void sudoku_imprime_final(char *motivoFinal) {
     
 	strcpy(mensajeFinal, "\n--- FIN DE LA PARTIDA ---\nMotivo: ");
     strcat(mensajeFinal, motivoFinal);
-    sprintf(tiempos, "\nTiempo de juego total: %d minutos y %d segundos\nTiempo de calculo de candidatos: %d microsegundos\nSi quiere volver a jugar, escriba '#NEW!' o pulse cualquier boton\n", RTC_leer_minutos(), RTC_leer_segundos(), tiempoTotal);
+    sprintf(tiempos, "\nTiempo de juego total: %d minutos y %d segundos\nTiempo de calculo de candidatos: %d microsegundos\n\n", RTC_leer_minutos(), RTC_leer_segundos(), tiempoTotal);
     strcat(mensajeFinal, tiempos);
     gestor_io_enviar_cadena(mensajeFinal);
+	
+	sudoku_iniciar();
 }
 
 /**************************************************************/
@@ -238,10 +240,6 @@ void sudoku_imprime_final(char *motivoFinal) {
 // Inicializamos la partida
 void sudoku_iniciar(void) {
     estado = INICIO;
-    
-    // Inicializamos el contador de tiempo de calculo y el RTC
-    tiempoTotal = 0;
-    RTC_init();
     
     // Inicializamos el tablero
     for (int i = 0; i < NUM_FILAS; i++) {
@@ -257,6 +255,12 @@ void sudoku_iniciar(void) {
     uint32_t alarma = evento_actualizar_juego << 24;
     alarma |= 0x008000c8; 
     cola_guardar_eventos(evento_set_alarma, alarma);
+}
+
+void sudoku_iniciar_contadores(void) {
+	// Inicializamos el contador de tiempo de calculo y el RTC
+    tiempoTotal = 0;
+    RTC_init();
 }
 
 // Introducir jugada en el tablero actual
@@ -349,6 +353,8 @@ void sudoku_pulsacion_1(void) {
 		{
             // Comienza el juego
             estado = JUGANDO;
+			
+			sudoku_iniciar_contadores();
 
             // Mostramos el tablero inicial
             sudoku_to_string(tablero, cadenaSudoku);
@@ -403,7 +409,8 @@ void sudoku_pulsacion_2(void) {
 		{
             // Comienza el juego
             estado = JUGANDO;
-
+			sudoku_iniciar_contadores();
+			
             // Mostramos el tablero inicial
             sudoku_to_string(tablero, cadenaSudoku);
             gestor_io_enviar_cadena(cadenaSudoku);
@@ -448,9 +455,10 @@ void sudoku_nuevo(void) {
         // mostrar el tablero inicial
         sudoku_to_string(tablero, cadenaSudoku);
         gestor_io_enviar_cadena(cadenaSudoku);
-
+		
         // Pasamos a estado JUGANDO
         estado = JUGANDO;
+		sudoku_iniciar_contadores();
     }
 }
 
@@ -458,7 +466,7 @@ void sudoku_nuevo(void) {
 void sudoku_reset(void) {
     if (estado == JUGANDO) {
         sudoku_imprime_final("reset");
-
+		
         // Pasamos a estado FINAL
         estado = FINAL;
     }
